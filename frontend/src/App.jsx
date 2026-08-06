@@ -6,12 +6,14 @@ import Dashboard from "./pages/Dashboard";
 import Upload from "./pages/Upload";
 import Defect from "./pages/Defect";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+
 function App() {
   return (
     <BrowserRouter>
-
       <Routes>
 
+        {/* Public Routes */}
         <Route path="/" element={<Login />} />
 
         <Route
@@ -19,23 +21,35 @@ function App() {
           element={<Register />}
         />
 
+        {/* Protected Routes */}
         <Route
           path="/dashboard"
-          element={<Dashboard />}
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/upload"
-          element={<Upload />}
+          element={
+            <ProtectedRoute>
+              <Upload />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/defect"
-          element={<Defect />}
+          element={
+            <ProtectedRoute>
+              <Defect />
+            </ProtectedRoute>
+          }
         />
 
       </Routes>
-
     </BrowserRouter>
   );
 }
