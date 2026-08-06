@@ -1,68 +1,73 @@
 import { Link } from "react-router-dom";
+import Navbar from "../components/Navbar";
 
 function Dashboard() {
   return (
-    <div className="container mt-5">
+    <>
+      <Navbar />
 
-      <div className="text-center mb-5">
-        <h1>Textile Waste Management Dashboard</h1>
+      <div className="container mt-5">
 
-        <p className="lead">
-          AI-powered textile classification and waste management system
-        </p>
-      </div>
+        <div className="text-center mb-5">
+          <h1>Textile Waste Management Dashboard</h1>
 
-      <div className="row justify-content-center">
-
-        <div className="col-md-4 mb-4">
-          <div className="card shadow h-100">
-
-            <div className="card-body text-center">
-
-              <h3>Fabric Classification</h3>
-
-              <p>
-                Upload a textile image and identify its fabric type.
-              </p>
-
-              <Link
-                to="/upload"
-                className="btn btn-success"
-              >
-                Classify Fabric
-              </Link>
-
-            </div>
-
-          </div>
+          <p className="lead">
+            AI-powered textile classification and waste management system
+          </p>
         </div>
 
-        <div className="col-md-4 mb-4">
-          <div className="card shadow h-100">
+        <div className="row justify-content-center">
 
-            <div className="card-body text-center">
+          <div className="col-md-4 mb-4">
+            <div className="card shadow h-100">
 
-              <h3>Fabric Defect Detection</h3>
+              <div className="card-body text-center">
 
-              <p>
-                Upload a fabric image and detect possible defects.
-              </p>
+                <h3>Fabric Classification</h3>
 
-              <Link
-                to="/defect"
-                className="btn btn-danger"
-              >
-                Detect Defect
-              </Link>
+                <p>
+                  Upload a textile image and identify its fabric type.
+                </p>
+
+                <Link
+                  to="/upload"
+                  className="btn btn-success"
+                >
+                  Classify Fabric
+                </Link>
+
+              </div>
 
             </div>
-
           </div>
+
+          <div className="col-md-4 mb-4">
+            <div className="card shadow h-100">
+
+              <div className="card-body text-center">
+
+                <h3>Fabric Defect Detection</h3>
+
+                <p>
+                  Upload a fabric image and detect possible defects.
+                </p>
+
+                <Link
+                  to="/defect"
+                  className="btn btn-danger"
+                >
+                  Detect Defect
+                </Link>
+
+              </div>
+
+            </div>
+          </div>
+
         </div>
 
       </div>
-
-    </div>
+    </>
   );
 }
 
