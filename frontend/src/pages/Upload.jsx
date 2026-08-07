@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../services/api";
 
 function Upload() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -43,80 +43,46 @@ function Upload() {
 
 
   const handleUpload = async () => {
-
+    
     if (!selectedFile) {
-
-      alert(
-        "Please select an image first."
-      );
-
+      alert("Please select an image first.");
       return;
     }
-
-
+    
     const formData = new FormData();
-
-    formData.append(
-      "file",
-      selectedFile
-    );
-
-
-    const token =
-      localStorage.getItem("token");
-
-
-    // Select the correct backend endpoint
+    formData.append("file", selectedFile);
+    
     const endpoint =
       predictionType === "fabric"
-        ? "http://localhost:8080/api/predict/fabric"
-        : "http://localhost:8080/api/predict/defect";
-
-
+        ? "/api/predict/fabric"
+        : "/api/predict/defect";
+      
     try {
-
+      
       setLoading(true);
-
-
-      const response =
-        await axios.post(
-          endpoint,
-          formData,
-          {
-            headers: {
-              Authorization:
-                `Bearer ${token}`,
-            },
-          }
-        );
-
-
-      setPrediction(
-        response.data.prediction
+      
+      const response = await api.post(
+        endpoint,
+        formData
       );
-
-      setConfidence(
-        response.data.confidence
-      );
-
-
+      
+      setPrediction(response.data.prediction);
+      setConfidence(response.data.confidence);
+    
     } catch (error) {
-
+      
       console.log(error);
-
-
+      
       alert(
         error.response?.data?.error ||
         "Image prediction failed."
       );
-
-
+    
     } finally {
-
+      
       setLoading(false);
-
+    
     }
-
   };
 
 

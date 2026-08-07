@@ -14,6 +14,8 @@ function Dashboard() {
 
       <div className="row justify-content-center">
 
+        {/* Fabric Classification */}
+
         <div className="col-md-4 mb-4">
           <div className="card shadow h-100">
 
@@ -37,6 +39,9 @@ function Dashboard() {
           </div>
         </div>
 
+
+        {/* Fabric Defect Detection */}
+
         <div className="col-md-4 mb-4">
           <div className="card shadow h-100">
 
@@ -53,6 +58,33 @@ function Dashboard() {
                 className="btn btn-danger"
               >
                 Detect Defect
+              </Link>
+
+            </div>
+
+          </div>
+        </div>
+
+
+        {/* Sustainability Dashboard */}
+
+        <div className="col-md-4 mb-4">
+          <div className="card shadow h-100">
+
+            <div className="card-body text-center">
+
+              <h3>Sustainability Analytics</h3>
+
+              <p>
+                View sustainability, environmental impact,
+                recycling and circular economy analytics.
+              </p>
+
+              <Link
+                to="/sustainability"
+                className="btn btn-primary"
+              >
+                View Sustainability
               </Link>
 
             </div>
