@@ -5,23 +5,31 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Upload from "./pages/Upload";
 import Defect from "./pages/Defect";
+import SustainabilityDashboard from "./pages/SustainabilityDashboard";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <BrowserRouter>
+
       <Routes>
 
         {/* Public Routes */}
-        <Route path="/" element={<Login />} />
+
+        <Route
+          path="/"
+          element={<Login />}
+        />
 
         <Route
           path="/register"
           element={<Register />}
         />
 
+
         {/* Protected Routes */}
+
         <Route
           path="/dashboard"
           element={
@@ -49,7 +57,17 @@ function App() {
           }
         />
 
+        <Route
+          path="/sustainability"
+          element={
+            <ProtectedRoute>
+              <SustainabilityDashboard />
+            </ProtectedRoute>
+          }
+        />
+
       </Routes>
+
     </BrowserRouter>
   );
 }
