@@ -13,42 +13,29 @@ function Upload() {
   const [confidence, setConfidence] =
     useState("");
 
+  const [weight, setWeight] =
+    useState(2);
+
+  const [analysis, setAnalysis] =
+    useState(null);
+
   const [loading, setLoading] =
     useState(false);
-
-  // Milestone 3 results
-  const [sustainability, setSustainability] =
-    useState(null);
-
-  const [environmentalImpact, setEnvironmentalImpact] =
-    useState(null);
-
-  const [recommendation, setRecommendation] =
-    useState(null);
-
-  const [weight, setWeight] =
-    useState(1);
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
 
-    // Clear previous results
     setPrediction("");
     setConfidence("");
-    setSustainability(null);
-    setEnvironmentalImpact(null);
-    setRecommendation(null);
+    setAnalysis(null);
   };
 
   const handlePredictionTypeChange = (event) => {
     setPredictionType(event.target.value);
 
-    // Clear previous results
     setPrediction("");
     setConfidence("");
-    setSustainability(null);
-    setEnvironmentalImpact(null);
-    setRecommendation(null);
+    setAnalysis(null);
   };
 
   const handleUpload = async () => {
@@ -68,7 +55,6 @@ function Upload() {
     try {
       setLoading(true);
 
-      // Step 1: AI prediction
       const response = await api.post(
         endpoint,
         formData
@@ -83,90 +69,68 @@ function Upload() {
       setPrediction(predictedMaterial);
       setConfidence(predictedConfidence);
 
-      // Step 2: Run Milestone 3 analysis
-      // Only fabric classification is used
-      // for sustainability analysis.
+      /*
+       * Sustainability analysis is only performed
+       * for fabric classification.
+       */
       if (predictionType === "fabric") {
-
         const analysisResponse =
           await api.post(
-            "/api/analysis/full",
-            null,
-            {
-              params: {
-                material: predictedMaterial,
-                confidence: predictedConfidence,
-                weight: weight
-              }
-            }
+            `/api/analysis/full?material=${encodeURIComponent(
+              predictedMaterial
+            )}&confidence=${predictedConfidence}&weight=${weight}`
           );
 
-        const analysis =
-          analysisResponse.data;
-
-        setSustainability(
-          analysis.sustainability
-        );
-
-        setEnvironmentalImpact(
-          analysis.environmentalImpact
-        );
-
-        setRecommendation(
-          analysis.recommendation
-        );
+        setAnalysis(analysisResponse.data);
       }
 
     } catch (error) {
-
       console.log(error);
 
       alert(
         error.response?.data?.error ||
-        error.response?.data?.message ||
-        "Image prediction or analysis failed."
+        "Image prediction failed."
       );
 
     } finally {
-
       setLoading(false);
-
     }
   };
 
   return (
-    <div className="container mt-5">
+    <div className="container mt-5 mb-5">
 
-      <h2>
-        Textile AI Prediction
-      </h2>
+      {/* Page Header */}
+      <div className="text-center mb-4">
 
-      <p>
-        Select a prediction model and
-        upload a textile image.
-      </p>
+        <h2 className="fw-bold">
+          Textile AI Analysis
+        </h2>
 
+        <p className="text-muted">
+          Identify fabric, analyze sustainability,
+          and get recycling recommendations.
+        </p>
+
+      </div>
+
+
+      {/* Upload Card */}
       <div
-        className="card p-4 mt-4"
-        style={{
-          maxWidth: "700px"
-        }}
+        className="card shadow-sm mx-auto p-4"
+        style={{ maxWidth: "700px" }}
       >
 
-        {/* Select AI model */}
+        {/* Prediction Model */}
 
-        <label className="form-label">
-          <b>
-            Select Prediction Model
-          </b>
+        <label className="form-label fw-bold">
+          Select Prediction Model
         </label>
 
         <select
           className="form-select mb-3"
           value={predictionType}
-          onChange={
-            handlePredictionTypeChange
-          }
+          onChange={handlePredictionTypeChange}
         >
 
           <option value="fabric">
@@ -179,41 +143,34 @@ function Upload() {
 
         </select>
 
-        {/* Information */}
 
-        {predictionType === "fabric" ? (
+        {/* Description */}
 
-          <p>
-            Upload a textile image to
-            identify its fabric type.
-          </p>
+        <p className="text-muted">
 
-        ) : (
+          {predictionType === "fabric"
+            ? "Upload a textile image to identify its fabric type and analyze its sustainability."
+            : "Upload a fabric image to identify possible defects."
+          }
 
-          <p>
-            Upload a fabric image to
-            identify possible defects.
-          </p>
+        </p>
 
-        )}
 
         {/* Weight */}
 
         {predictionType === "fabric" && (
 
-          <div className="mb-3">
+          <>
 
-            <label className="form-label">
-              <b>
-                Textile Weight (kg)
-              </b>
+            <label className="form-label fw-bold">
+              Textile Weight (kg)
             </label>
 
             <input
               type="number"
-              className="form-control"
               min="0.1"
               step="0.1"
+              className="form-control mb-3"
               value={weight}
               onChange={(e) =>
                 setWeight(e.target.value)
@@ -221,251 +178,315 @@ function Upload() {
             />
 
             <small className="text-muted">
-              Used for environmental impact
-              calculation.
+              Used for environmental impact calculation.
             </small>
 
-          </div>
+          </>
 
         )}
 
-        {/* Image input */}
+
+        {/* File */}
+
+        <label className="form-label fw-bold mt-3">
+          Upload Textile Image
+        </label>
 
         <input
           type="file"
           accept="image/*"
           className="form-control mb-3"
-          onChange={
-            handleFileChange
-          }
+          onChange={handleFileChange}
         />
 
-        {/* Selected image */}
+
+        {/* Selected File */}
 
         {selectedFile && (
 
-          <p>
+          <div className="alert alert-secondary">
 
-            Selected image:
+            <b>Selected image:</b>{" "}
+            {selectedFile.name}
 
-            {" "}
-
-            <b>
-              {selectedFile.name}
-            </b>
-
-          </p>
+          </div>
 
         )}
 
-        {/* Prediction button */}
+
+        {/* Button */}
 
         <button
-          className="btn btn-success"
+          className="btn btn-success w-100"
           onClick={handleUpload}
           disabled={loading}
         >
 
           {loading
-
             ? "Analyzing..."
-
             : predictionType === "fabric"
-
               ? "Predict & Analyze"
-
               : "Detect Fabric Defect"
-
           }
 
         </button>
 
-        {/* Prediction result */}
+      </div>
 
-        {prediction && (
 
-          <div
-            className="alert alert-success mt-4"
-          >
+      {/* Prediction Result */}
 
-            <h4>
-              Prediction Result
-            </h4>
+      {prediction && (
 
-            <p>
+        <div
+          className="card shadow-sm mx-auto mt-4 p-4"
+          style={{ maxWidth: "700px" }}
+        >
 
-              <b>
+          <h4 className="fw-bold mb-3">
+            AI Prediction
+          </h4>
 
-                {predictionType === "fabric"
-                  ? "Fabric"
-                  : "Defect"
-                }:
+          <div className="row">
 
-              </b>
+            <div className="col-md-6">
 
-              {" "}
+              <p>
+                <b>
+                  {predictionType === "fabric"
+                    ? "Fabric"
+                    : "Defect"
+                  }
+                </b>
+              </p>
 
-              {prediction}
+              <h5>
+                {prediction}
+              </h5>
 
-            </p>
+            </div>
 
-            <p>
+            <div className="col-md-6">
 
-              <b>
-                Confidence:
-              </b>
+              <p>
+                <b>Confidence</b>
+              </p>
 
-              {" "}
+              <h5>
+                {confidence}%
+              </h5>
 
-              {confidence}%
-
-            </p>
+            </div>
 
           </div>
 
-        )}
+        </div>
 
-        {/* Sustainability Analysis */}
+      )}
 
-        {sustainability && (
 
-          <div className="card mt-4 p-3">
+      {/* Sustainability Analysis */}
 
-            <h4>
+      {analysis && (
+
+        <>
+
+          {/* Sustainability */}
+
+          <div
+            className="card shadow-sm mx-auto mt-4 p-4"
+            style={{ maxWidth: "700px" }}
+          >
+
+            <h4 className="fw-bold mb-4">
               Sustainability Analysis
             </h4>
 
-            <p>
-              <b>
-                Sustainability Score:
-              </b>{" "}
-              {sustainability.sustainabilityScore}
-            </p>
+            <div className="text-center mb-4">
 
-            <p>
-              <b>
-                Recyclability:
-              </b>{" "}
-              {sustainability.recyclability}
-            </p>
+              <h5>
+                Sustainability Score
+              </h5>
 
-            <p>
-              <b>
-                Reusability:
-              </b>{" "}
-              {sustainability.reusability}
-            </p>
+              <h1 className="fw-bold">
+                {analysis.sustainability?.sustainabilityScore}
+              </h1>
 
-            <p>
-              <b>
-                Biodegradability:
-              </b>{" "}
-              {sustainability.biodegradability}
-            </p>
+                <p className="text-muted">
+                  out of 100
+                </p>
 
-            <p>
-              <b>
-                Environmental Impact:
-              </b>{" "}
-              {sustainability.environmentalImpact}
+            </div>
+
+
+            <div className="row text-center">
+
+              <div className="col-md-4 mb-3">
+
+                <b>Recyclability</b>
+
+                <p>
+                  {analysis.sustainability?.recyclability}
+                </p>
+
+              </div>
+
+
+              <div className="col-md-4 mb-3">
+
+                <b>Reusability</b>
+
+                <p>
+                  {analysis.sustainability?.reusability}
+                </p>
+
+              </div>
+
+
+              <div className="col-md-4 mb-3">
+
+                <b>Biodegradability</b>
+
+                <p>
+                  {analysis.sustainability?.biodegradability}
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <p className="text-center">
+
+              <b>Environmental Impact:</b>{" "}
+
+              {analysis.sustainability?.environmentalImpact}
+
             </p>
 
           </div>
 
-        )}
 
-        {/* Environmental Impact */}
+          {/* Environmental Impact */}
 
-        {environmentalImpact && (
+          <div
+            className="card shadow-sm mx-auto mt-4 p-4"
+            style={{ maxWidth: "700px" }}
+          >
 
-          <div className="card mt-4 p-3">
-
-            <h4>
+            <h4 className="fw-bold mb-4">
               Environmental Impact
             </h4>
 
-            <p>
-              <b>
-                Weight:
-              </b>{" "}
-              {environmentalImpact.weight} kg
-            </p>
+            <div className="row text-center">
 
-            <p>
-              <b>
-                Water Impact:
-              </b>{" "}
-              {environmentalImpact.waterImpact}
-            </p>
+              <div className="col-md-6 mb-3">
 
-            <p>
-              <b>
-                Carbon Impact:
-              </b>{" "}
-              {environmentalImpact.carbonImpact}
-            </p>
+                <b>Weight</b>
 
-            <p>
-              <b>
-                Waste Impact:
-              </b>{" "}
-              {environmentalImpact.wasteImpact}
-            </p>
+                <p>
+                  {analysis.environmentalImpact?.weight} kg
+                </p>
 
-            <p>
-              <b>
-                Overall Impact Score:
-              </b>{" "}
-              {environmentalImpact.overallImpactScore}
-            </p>
+              </div>
 
-            <p>
-              <b>
-                Impact Level:
-              </b>{" "}
-              {environmentalImpact.impactLevel}
-            </p>
+
+              <div className="col-md-6 mb-3">
+
+                <b>Water Impact</b>
+
+                <p>
+                  {analysis.environmentalImpact?.waterImpact}
+                </p>
+
+              </div>
+
+
+              <div className="col-md-6 mb-3">
+
+                <b>Carbon Impact</b>
+
+                <p>
+                  {analysis.environmentalImpact?.carbonImpact}
+                </p>
+
+              </div>
+
+
+              <div className="col-md-6 mb-3">
+
+                <b>Waste Impact</b>
+
+                <p>
+                  {analysis.environmentalImpact?.wasteImpact}
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div className="text-center mt-3">
+
+              <h5>
+                Overall Impact Score
+              </h5>
+
+              <h2 className="fw-bold">
+                {analysis.environmentalImpact?.overallImpactScore}
+              </h2>
+
+              <p>
+
+                <b>Impact Level:</b>{" "}
+
+                {analysis.environmentalImpact?.impactLevel}
+
+              </p>
+
+            </div>
 
           </div>
 
-        )}
 
-        {/* Recycling Recommendation */}
+          {/* Recycling Recommendation */}
 
-        {recommendation && (
+          <div
+            className="card shadow-sm mx-auto mt-4 p-4"
+            style={{ maxWidth: "700px" }}
+          >
 
-          <div className="card mt-4 p-3">
-
-            <h4>
+            <h4 className="fw-bold mb-4">
               Recycling Recommendation
             </h4>
 
+            <h5>
+              {analysis.recommendation?.recommendation}
+            </h5>
+
+            <hr />
+
             <p>
-              <b>
-                Recommendation:
-              </b>{" "}
-              {recommendation.recommendation}
+              <b>Recommended Action:</b>
             </p>
 
             <p>
-              <b>
-                Recommended Action:
-              </b>{" "}
-              {recommendation.recommendedAction}
+              {analysis.recommendation?.recommendedAction}
             </p>
 
             <p>
-              <b>
-                Reason:
-              </b>{" "}
-              {recommendation.reason}
+              <b>Reason:</b>
+            </p>
+
+            <p>
+              {analysis.recommendation?.reason}
             </p>
 
           </div>
 
-        )}
+        </>
 
-      </div>
+      )}
 
     </div>
   );
